@@ -1,10 +1,13 @@
 package com.stahlt.cycleconfigurator.ui.cycle.list
 
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -19,7 +22,17 @@ import com.stahlt.cycleconfigurator.ui.theme.CycleConfiguratorTheme
 
 @Composable
 fun CycleListScreen(modifier: Modifier = Modifier) {
-    Scaffold() { paddingValues->
+    Scaffold(
+        modifier = modifier.fillMaxSize() ,
+        topBar = {
+            CyclesTopBar(modifier)
+        } ,
+        floatingActionButton = {
+            FloatingActionButton(onClick = { /*TODO*/ }) {
+                Icon(imageVector = Icons.Default.Add ,contentDescription = "Add")
+            }
+        }
+    ) { paddingValues->
         Box(modifier = modifier.padding(paddingValues)) // just to not break
     }
 }
