@@ -1,5 +1,8 @@
 package com.stahlt.cycleconfigurator.data.cycle
 
+import kotlinx.serialization.Serializable
+
+@Serializable
 data class Cycle(
     var id: Int = 0,
     var name: String = "",
