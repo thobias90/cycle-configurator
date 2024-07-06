@@ -35,7 +35,9 @@ import com.stahlt.cycleconfigurator.ui.utils.composable.DefaultLoading
 @Composable
 fun CycleListScreen(
     modifier: Modifier = Modifier,
-    viewModel: CyclesListViewModel = viewModel()
+    viewModel: CyclesListViewModel = viewModel(),
+    onAddPressed: () -> Unit,
+    onCyclePressed: (Cycle) -> Unit
 ) {
     Scaffold(
         modifier = modifier.fillMaxSize() ,
@@ -46,7 +48,7 @@ fun CycleListScreen(
             )
         } ,
         floatingActionButton = {
-            FloatingActionButton(onClick = { /*TODO*/ }) {
+            FloatingActionButton(onClick = onAddPressed) {
                 Icon(imageVector = Icons.Default.Add ,contentDescription = "Add")
             }
         }
@@ -60,13 +62,13 @@ fun CycleListScreen(
             DefaultErrorLoading(
                 modifier = modifier ,
                 text = "Unable to load cycles" ,
-                onTryAgainPressed = {}
+                onTryAgainPressed = viewModel::load
             )
         } else {
             CyclesList(
                 modifier = modifier.padding(paddingValues) ,
                 cycles = viewModel.uiState.cycles ,
-                onCyclePressed = {}
+                onCyclePressed = onCyclePressed(Cycle)
             )
         }
     }
@@ -104,7 +106,7 @@ fun CyclesTopBarPreview(modifier: Modifier = Modifier) {
 fun CyclesList(
     modifier: Modifier = Modifier ,
     cycles: List<Cycle> ,
-    onCyclePressed: () -> Unit
+    onCyclePressed: (Cycle) -> Unit
 ) {
     if (cycles.isEmpty()) {
         EmptyList(modifier)
@@ -112,7 +114,7 @@ fun CyclesList(
         FilledList(
             modifier ,
             cycles ,
-            onCyclePressed = onCyclePressed
+            onCyclePressed = onCyclePressed(Cycle)
         )
     }
 }
@@ -147,13 +149,13 @@ fun EmptyListPreview(modifier: Modifier = Modifier) {
 }
 
 @Composable
-fun FilledList(modifier: Modifier = Modifier ,cycles: List<Cycle> ,onCyclePressed: () -> Unit) {
+fun FilledList(modifier: Modifier = Modifier ,cycles: List<Cycle> ,onCyclePressed: (Cycle) -> Unit) {
     LazyColumn(modifier = modifier) {
         items(cycles) {  cycle->
             ListItem(
                 modifier = Modifier
                     .padding(vertical = 4.dp)
-                    .clickable { onCyclePressed } ,
+                    .clickable { onCyclePressed(cycle) } ,
                 headlineContent = {
                     Text(
                         text = "${cycle.id} - ${cycle.name}" ,
