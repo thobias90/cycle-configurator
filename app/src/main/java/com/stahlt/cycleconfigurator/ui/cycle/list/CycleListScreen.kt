@@ -28,9 +28,15 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.stahlt.cycleconfigurator.data.cycle.Cycle
 import com.stahlt.cycleconfigurator.ui.theme.CycleConfiguratorTheme
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.stahlt.apppedidos.ui.utils.composables.DefaultErrorLoading
+import com.stahlt.cycleconfigurator.ui.utils.composable.DefaultLoading
 
 @Composable
-fun CycleListScreen(modifier: Modifier = Modifier) {
+fun CycleListScreen(
+    modifier: Modifier = Modifier,
+    viewModel: CyclesListViewModel = viewModel()
+) {
     Scaffold(
         modifier = modifier.fillMaxSize() ,
         topBar = {
@@ -42,19 +48,24 @@ fun CycleListScreen(modifier: Modifier = Modifier) {
             }
         }
     ) { paddingValues->
-        CyclesList(
-            modifier = modifier.padding(paddingValues) ,
-            cycles = cyclesFake ,
-            onCyclePressed = {}
-        )
-    }
-}
-
-@Preview
-@Composable
-fun CycleListScreenPreview(modifier: Modifier = Modifier) {
-    CycleConfiguratorTheme {
-        CycleListScreen(modifier)
+        if (viewModel.uiState.loading) {
+            DefaultLoading(
+                modifier = modifier ,
+                text = "Loading"
+            )
+        } else if (viewModel.uiState.hasError) {
+            DefaultErrorLoading(
+                modifier = modifier ,
+                text = "Unable to load cycles" ,
+                onTryAgainPressed = {}
+            )
+        } else {
+            CyclesList(
+                modifier = modifier.padding(paddingValues) ,
+                cycles = viewModel.uiState.cycles ,
+                onCyclePressed = {}
+            )
+        }
     }
 }
 
