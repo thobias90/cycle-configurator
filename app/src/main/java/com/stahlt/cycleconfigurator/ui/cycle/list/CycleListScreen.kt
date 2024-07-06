@@ -2,12 +2,11 @@ package com.stahlt.cycleconfigurator.ui.cycle.list
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowForward
@@ -43,7 +42,11 @@ fun CycleListScreen(modifier: Modifier = Modifier) {
             }
         }
     ) { paddingValues->
-        Box(modifier = modifier.padding(paddingValues)) // just to not break
+        CyclesList(
+            modifier = modifier.padding(paddingValues) ,
+            cycles = cyclesFake ,
+            onCyclePressed = {}
+        )
     }
 }
 
@@ -82,11 +85,19 @@ fun CyclesTopBarPreview(modifier: Modifier = Modifier) {
 }
 
 @Composable
-fun CyclesList(modifier: Modifier = Modifier ,cycles: List<Cycle>) {
+fun CyclesList(
+    modifier: Modifier = Modifier ,
+    cycles: List<Cycle> ,
+    onCyclePressed: () -> Unit
+) {
     if (cycles.isEmpty()) {
         EmptyList(modifier)
     } else {
-        // show filled list
+        FilledList(
+            modifier ,
+            cycles ,
+            onCyclePressed = onCyclePressed
+        )
     }
 }
 
@@ -122,7 +133,7 @@ fun EmptyListPreview(modifier: Modifier = Modifier) {
 @Composable
 fun FilledList(modifier: Modifier = Modifier ,cycles: List<Cycle> ,onCyclePressed: () -> Unit) {
     LazyColumn(modifier = modifier) {
-        itemsIndexed(cycles) { index ,cycle->
+        items(cycles) {  cycle->
             ListItem(
                 modifier = Modifier
                     .padding(vertical = 4.dp)
