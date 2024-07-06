@@ -36,6 +36,13 @@ fun CycleListScreen(modifier: Modifier = Modifier) {
         Box(modifier = modifier.padding(paddingValues)) // just to not break
     }
 }
+@Preview
+@Composable
+fun CycleListScreenPreview(modifier: Modifier = Modifier) {
+    CycleConfiguratorTheme {
+        CycleListScreen(modifier)
+    }
+}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
