@@ -8,8 +8,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
@@ -40,7 +40,10 @@ fun CycleListScreen(
     Scaffold(
         modifier = modifier.fillMaxSize() ,
         topBar = {
-            CyclesTopBar(modifier)
+            CyclesTopBar(
+                modifier ,
+                onRefresh = viewModel::load
+            )
         } ,
         floatingActionButton = {
             FloatingActionButton(onClick = { /*TODO*/ }) {
@@ -71,7 +74,7 @@ fun CycleListScreen(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CyclesTopBar(modifier: Modifier = Modifier) {
+fun CyclesTopBar(modifier: Modifier = Modifier, onRefresh: () -> Unit) {
     TopAppBar(
         modifier = modifier ,
         title = { Text("Cycles") } ,
@@ -80,7 +83,7 @@ fun CyclesTopBar(modifier: Modifier = Modifier) {
             titleContentColor = MaterialTheme.colorScheme.primary
         ) ,
         actions = {
-            IconButton(onClick = { /*TODO*/ }) {
+            IconButton(onClick = onRefresh) {
                 Icon(imageVector = Icons.Filled.Refresh ,contentDescription = "Update")
             }
         }
@@ -91,7 +94,9 @@ fun CyclesTopBar(modifier: Modifier = Modifier) {
 @Composable
 fun CyclesTopBarPreview(modifier: Modifier = Modifier) {
     CycleConfiguratorTheme {
-        CyclesTopBar()
+        CyclesTopBar(
+            onRefresh = {}
+        )
     }
 }
 
@@ -157,7 +162,7 @@ fun FilledList(modifier: Modifier = Modifier ,cycles: List<Cycle> ,onCyclePresse
                 } ,
                 trailingContent = {
                     Icon(
-                        imageVector = Icons.Filled.ArrowForward ,
+                        imageVector = Icons.AutoMirrored.Filled.ArrowForward ,
                         contentDescription = "Select"
                     )
                 }

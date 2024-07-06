@@ -8,6 +8,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.stahlt.cycleconfigurator.data.cycle.Cycle
 import com.stahlt.cycleconfigurator.data.cycle.network.ApiCycles
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 data class CyclesListUIState(
@@ -32,6 +33,7 @@ class CyclesListViewModel: ViewModel() {
             hasError = false
         )
         viewModelScope.launch {
+            delay(500)
             uiState = try {
                 val cycles = ApiCycles.retrofitService.findAll()
                 uiState.copy(
