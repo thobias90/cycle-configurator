@@ -39,7 +39,7 @@ class CyclesListViewModel: ViewModel() {
                     cycles = cycles
                 )
             } catch (ex: Exception) {
-                Log.d(tag, "Error on Loading Cycles List")
+                Log.d(tag, "Error on Loading Cycles List", ex)
                 uiState.copy(
                     hasError = true,
                     loading = false
