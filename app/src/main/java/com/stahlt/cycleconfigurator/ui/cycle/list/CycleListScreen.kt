@@ -68,7 +68,7 @@ fun CycleListScreen(
             CyclesList(
                 modifier = modifier.padding(paddingValues) ,
                 cycles = viewModel.uiState.cycles ,
-                onCyclePressed = onCyclePressed(Cycle)
+                onCyclePressed = onCyclePressed
             )
         }
     }
@@ -114,7 +114,7 @@ fun CyclesList(
         FilledList(
             modifier ,
             cycles ,
-            onCyclePressed = onCyclePressed(Cycle)
+            onCyclePressed = onCyclePressed
         )
     }
 }
