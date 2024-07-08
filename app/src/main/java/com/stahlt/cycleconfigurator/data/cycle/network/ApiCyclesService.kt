@@ -3,6 +3,7 @@ package com.stahlt.cycleconfigurator.data.cycle.network
 import com.stahlt.cycleconfigurator.data.cycle.Cycle
 import kotlinx.serialization.json.Json
 import okhttp3.MediaType.Companion.toMediaType
+import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.kotlinx.serialization.asConverterFactory
 import retrofit2.http.Body
@@ -28,7 +29,7 @@ interface ApiCyclesService {
     suspend fun delete(id: Int)
 
     @POST("cycles")
-    suspend fun save(@Body cycle: Cycle): Cycle
+    suspend fun save(@Body cycle: Cycle): Response<Cycle>
 }
 
 object ApiCycles {
