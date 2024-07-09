@@ -43,7 +43,8 @@ fun CycleListScreen(
                 refreshIcon = true,
                 onRefreshPressed = viewModel::load,
                 onBackPressed = {},
-                onSavePressed = {}
+                onSavePressed = {},
+                onDeletePressed = {}
             )
         },
         floatingActionButton = {
@@ -82,7 +83,8 @@ fun CyclesTopBarPreview(modifier: Modifier = Modifier) {
             refreshIcon = true,
             onRefreshPressed = {},
             onSavePressed = {},
-            onBackPressed = {}
+            onBackPressed = {},
+            onDeletePressed = {}
         )
     }
 }
