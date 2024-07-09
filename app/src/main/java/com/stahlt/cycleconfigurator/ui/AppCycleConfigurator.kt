@@ -2,6 +2,7 @@ package com.stahlt.cycleconfigurator.ui
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -13,9 +14,9 @@ import com.stahlt.cycleconfigurator.ui.cycle.form.CycleFormScreen
 import com.stahlt.cycleconfigurator.ui.cycle.list.CycleListScreen
 
 object Screen {
-    const val List = "list"
-    const val Form = "form"
-    const val Details = "details"
+    const val LIST = "list"
+    const val FORM = "form"
+    const val DETAILS = "details"
 }
 
 @Composable
@@ -25,28 +26,30 @@ fun AppCycleConfigurator(
 ) {
     NavHost(
         navController = navController,
-        startDestination = Screen.List,
+        startDestination = Screen.LIST,
         modifier = modifier
     ) {
-        composable(route = Screen.List) {
+        composable(route = Screen.LIST) {
             CycleListScreen(
-                onAddPressed = { navController.navigate(Screen.Form) },
-                onCyclePressed = { cycle-> navController.navigate("${Screen.Details}/${cycle.id}") }
+                onAddPressed = { navController.navigate(Screen.FORM) },
+                onCyclePressed = { cycle-> navController.navigate("${Screen.FORM}?id=${cycle.id}") }
             )
         }
         composable(
-            route = "${Screen.Form}?id={id}",
+            route = "${Screen.FORM}?id={id}",
             arguments = listOf(navArgument(name = "id") {
-                type = NavType.StringType;
+                type = NavType.StringType
                 nullable = true
             })
         ) {
             CycleFormScreen(
-                onBackPressed = { navController.popBackStack() }
+                onBackPressed = { navController.popBackStack() },
+                onCycleSaved = { navigateToListCycles(navController) },
+                onCycleDeleted = { navigateToListCycles(navController) }
             )
         }
         composable(
-            route = "${Screen.Details}/{id}",
+            route = "${Screen.DETAILS}/{id}",
             arguments = listOf(navArgument(name = "id") { type = NavType.IntType })
         ) {
             CycleDetailsScreen(
@@ -55,4 +58,12 @@ fun AppCycleConfigurator(
         }
     }
 
+}
+
+private fun navigateToListCycles(navController: NavHostController) {
+    navController.navigate(route = Screen.LIST) {
+        popUpTo(navController.graph.findStartDestination().id) {
+            inclusive = true
+        }
+    }
 }
