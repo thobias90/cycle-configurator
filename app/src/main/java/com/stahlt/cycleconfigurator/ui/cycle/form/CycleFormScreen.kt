@@ -9,11 +9,17 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -26,23 +32,86 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.stahlt.cycleconfigurator.ui.theme.CycleConfiguratorTheme
 import com.stahlt.cycleconfigurator.ui.utils.composable.AppCycleTopBar
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.stahlt.apppedidos.ui.utils.composables.DefaultErrorLoading
+import com.stahlt.cycleconfigurator.ui.utils.composable.DefaultLoading
 
 @Composable
-fun CycleFormScreen(modifier: Modifier = Modifier, onBackPressed: () -> Unit) {
-    val isNewCycle = true
+fun CycleFormScreen(
+    modifier: Modifier = Modifier,
+    viewModel: CycleFormViewModel = viewModel(),
+    snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
+    onBackPressed: () -> Unit,
+    onCycleSaved: () -> Unit,
+    onCycleDeleted: () -> Unit
+) {
+    LaunchedEffect(viewModel.uiState.saveCompleted) {
+        if (viewModel.uiState.saveCompleted) {
+            onCycleSaved()
+        }
+    }
+    LaunchedEffect(viewModel.uiState.deleteCompleted) {
+        if (viewModel.uiState.deleteCompleted) {
+            onCycleDeleted()
+        }
+    }
+    LaunchedEffect(snackbarHostState, viewModel.uiState.hasErrorDeleting) {
+        if (viewModel.uiState.hasErrorDeleting) {
+            snackbarHostState.showSnackbar("Error on deleting")
+        }
+    }
+    LaunchedEffect(snackbarHostState, viewModel.uiState.hasErrorSaving) {
+        if (viewModel.uiState.hasErrorSaving) {
+            snackbarHostState.showSnackbar("Error on saving")
+        }
+    }
+    if (viewModel.uiState.showConfirmationDialog) {
+        ConfirmationDialog(
+            title = "Attention",
+            text = "This cycle will be removed and can't be recovered",
+            onDismiss = viewModel::dismissConfirmationDialog,
+            onConfirm = viewModel::delete
+        )
+    }
+
     Scaffold(
+        snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
         topBar = {
             AppCycleTopBar(
-                title = if (isNewCycle) "Add Cycle" else "Update Cycle",
+                title = if (viewModel.uiState.cycleId <= 0) "Add Cycle" else "Update Cycle",
                 navigationIcon = true,
-                saveIcon = true,
+                saveIcon = !viewModel.uiState.hasErrorLoading,
+                deleteIcon = !viewModel.uiState.hasErrorLoading && (viewModel.uiState.cycleId > 0),
                 onBackPressed = onBackPressed,
+                onSavePressed = viewModel::save,
                 onRefreshPressed = {},
-                onSavePressed = {}
+                onDeletePressed = viewModel::showConfirmationDialog
             )
         }
     ) { paddingValues ->
-        FormContent(modifier = modifier.padding(paddingValues))
+        if (viewModel.uiState.isLoading) {
+            DefaultLoading(text = "Loading")
+        } else if (viewModel.uiState.hasErrorLoading) {
+            DefaultErrorLoading(
+                text = "Error Loading",
+                onTryAgainPressed = viewModel::load
+            )
+        } else if (viewModel.uiState.isDeleting) {
+            DefaultLoading(text = "Deleting")
+        } else if (viewModel.uiState.isSaving) {
+            DefaultLoading(text = "Saving")
+        } else {
+            FormContent(
+                modifier = modifier.padding(paddingValues),
+                cycleId = viewModel.uiState.cycleId,
+                formState = viewModel.uiState.formState,
+                onNameChanged = viewModel::onNameChanged,
+                onDelayChanged = viewModel::onDelayChanged,
+                onTemperatureChanged = viewModel::onTemperatureChanged,
+                onSoilLevelChanged = viewModel::onSoilLevelChanged,
+                onSpinSpeedChanged = viewModel::onSpinSpeedChanged
+            )
+        }
     }
 }
 
@@ -55,7 +124,16 @@ fun CycleFormScreen(modifier: Modifier = Modifier, onBackPressed: () -> Unit) {
 //}
 
 @Composable
-fun FormContent(modifier: Modifier = Modifier) {
+fun FormContent(
+    modifier: Modifier = Modifier,
+    cycleId: Int,
+    formState: FormState,
+    onNameChanged: (String) -> Unit,
+    onDelayChanged: (String) -> Unit,
+    onTemperatureChanged: (String) -> Unit,
+    onSpinSpeedChanged: (String) -> Unit,
+    onSoilLevelChanged: (String) -> Unit
+) {
     Column(
         modifier = modifier
             .fillMaxSize()
@@ -64,39 +142,39 @@ fun FormContent(modifier: Modifier = Modifier) {
                 rememberScrollState()
             )
     ) {
-        CycleId(id = 1)
+        CycleId(id = cycleId)
         FormTextField(
             label = "Name",
-            value = "",
-            onValueChanged = {},
+            value = formState.name,
+            onValueChanged = onNameChanged,
             errorMessageCode = null,
             keyboardCapitalization = KeyboardCapitalization.Words
         )
         FormTextField(
             label = "Delay",
-            value = "",
-            onValueChanged = {},
+            value = formState.delay.toString(),
+            onValueChanged = onDelayChanged,
             errorMessageCode = null,
             keyboardType = KeyboardType.Number
         )
         FormTextField(
             label = "Temperature",
-            value = "",
-            onValueChanged = {},
+            value = formState.temperature,
+            onValueChanged = onTemperatureChanged,
             errorMessageCode = null,
             keyboardCapitalization = KeyboardCapitalization.Words
         )
         FormTextField(
             label = "Spin Speed",
-            value = "",
-            onValueChanged = {},
+            value = formState.spinSpeed,
+            onValueChanged = onSpinSpeedChanged,
             errorMessageCode = null,
             keyboardCapitalization = KeyboardCapitalization.Words
         )
         FormTextField(
             label = "Soil Level",
-            value = "",
-            onValueChanged = {},
+            value = formState.soilLevel,
+            onValueChanged = onSoilLevelChanged,
             errorMessageCode = null,
             keyboardCapitalization = KeyboardCapitalization.Words,
             keyboardImeAction = ImeAction.Done
@@ -106,9 +184,17 @@ fun FormContent(modifier: Modifier = Modifier) {
 
 @Preview(showBackground = true)
 @Composable
-fun FormContentPreview(modifier: Modifier = Modifier) {
+fun FormContentPreview() {
     CycleConfiguratorTheme {
-        FormContent()
+        FormContent(
+            cycleId = 1,
+            formState = FormState(),
+            onNameChanged = {},
+            onDelayChanged = {},
+            onTemperatureChanged = {},
+            onSpinSpeedChanged = {},
+            onSoilLevelChanged = {}
+        )
     }
 }
 @Composable
@@ -188,4 +274,34 @@ private fun FormTextField(
             modifier = Modifier.padding(horizontal = 16.dp)
         )
     }
+}
+
+@Composable
+private fun ConfirmationDialog(
+    modifier: Modifier = Modifier,
+    title: String? = null,
+    text: String,
+    onDismiss: () -> Unit,
+    onConfirm: () -> Unit,
+    dismissButtonText: String? = null,
+    confirmButtonText: String? = null
+) {
+    AlertDialog(
+        modifier = modifier,
+        title = title?.let {
+            { Text(it) }
+        },
+        text = { Text(text) },
+        onDismissRequest = onDismiss,
+        confirmButton = {
+            TextButton(onClick = onConfirm) {
+                Text(confirmButtonText ?: "Confirm")
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text(dismissButtonText ?: "Dismiss")
+            }
+        }
+    )
 }
