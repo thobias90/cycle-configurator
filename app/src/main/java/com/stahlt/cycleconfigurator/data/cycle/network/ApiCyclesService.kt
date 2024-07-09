@@ -10,6 +10,7 @@ import retrofit2.http.Body
 import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.POST
+import retrofit2.http.Path
 
 private const val BASE_URL = "http://10.0.2.2:8080"
 
@@ -23,10 +24,10 @@ interface ApiCyclesService {
     suspend fun findAll(): List<Cycle>
 
     @GET("cycles/{id}")
-    suspend fun findById(id: Int): Cycle
+    suspend fun findById(@Path("id") id: Int): Cycle
 
     @DELETE("cycles/{id}")
-    suspend fun delete(id: Int)
+    suspend fun delete(@Path("id") id: Int)
 
     @POST("cycles")
     suspend fun save(@Body cycle: Cycle): Response<Cycle>
