@@ -3,6 +3,7 @@ package com.stahlt.cycleconfigurator.ui.utils.composable
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -13,6 +14,7 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import com.stahlt.cycleconfigurator.ui.theme.CycleConfiguratorTheme
 
@@ -24,9 +26,11 @@ fun AppCycleTopBar(
     navigationIcon: Boolean = false,
     saveIcon: Boolean = false,
     refreshIcon: Boolean = false,
+    deleteIcon: Boolean = false,
     onBackPressed: () -> Unit,
     onRefreshPressed: () -> Unit,
-    onSavePressed: () -> Unit
+    onSavePressed: () -> Unit,
+    onDeletePressed: () -> Unit
 ) {
     TopAppBar(
         title = { Text(title) },
@@ -45,6 +49,14 @@ fun AppCycleTopBar(
             }
         },
         actions = {
+            if (deleteIcon) {
+                IconButton(onClick = onDeletePressed) {
+                    Icon(
+                        imageVector = Icons.Filled.Delete,
+                        contentDescription = "delete"
+                    )
+                }
+            }
             if (saveIcon) {
                 IconButton(onClick = onSavePressed) {
                     Icon(
@@ -61,6 +73,7 @@ fun AppCycleTopBar(
                     )
                 }
             }
+
         }
     )
 }
@@ -74,9 +87,11 @@ fun AppCycleTopBarPreview(modifier: Modifier = Modifier) {
             navigationIcon = true,
             refreshIcon = true,
             saveIcon = true,
+            deleteIcon = true,
             onBackPressed = {},
             onSavePressed = {},
-            onRefreshPressed = {}
+            onRefreshPressed = {},
+            onDeletePressed = {}
         )
     }
 }
